@@ -1,143 +1,88 @@
-// Get the full source code, including the theme and Tailwind config:
-// https://github.com/resend/react-email/tree/canary/apps/demo/emails
+// src/emails/auth/ResetPassword.tsx
 
-import {
-  Body,
-  Button,
-  Column,
-  Container,
-  Head,
-  Html,
-  Img,
-  Link,
-  Preview,
-  Row,
-  Section,
-  Tailwind,
-  Text,
-} from "react-email";
+import { Link, Text } from "react-email";
 
-export const PasswordResetEmail = () => (
-  <Tailwind>
-    <Html>
-      <Head></Head>
+import { EmailButton } from "./components/email-button";
+import { EmailHeading } from "./components/email-heading";
+import { EmailLayout } from "./components/email-layout";
 
-      <Body className="bg-bg-2 font-14 m-0 p-0 font-sans">
-        <Preview>Reset your password</Preview>
-        <Container className="bg-bg mx-auto max-w-[640px]">
-          <Section className="mobile:px-4 mobile:pt-12 mobile:pb-10 px-6 pt-20 pb-14">
-            <Section className="mobile:mb-8 mb-12">
-              <Text className="font-56 font-condensed mobile:font-40 text-fg m-0 uppercase">
-                password reset
-              </Text>
-              <Text className="font-14 text-fg-2 m-0 mt-8 font-sans">
-                We received a request to reset your password for Test.
-              </Text>
-              <Text className="font-13 text-fg-3 m-0 mt-[18px] font-sans">
-                If you didn&apos;t request a reset, you can safely ignore this
-                email.
-              </Text>
-            </Section>
+interface ResetPasswordProps {
+  resetUrl: string;
+  userName?: string;
+}
 
-            <Button className="bg-fg font-15 text-bg inline-block px-5 py-3.5 text-center font-sans">
-              Create New Password
-            </Button>
-          </Section>
+export default function ResetPassword({
+  resetUrl,
+  userName,
+}: ResetPasswordProps) {
+  return (
+    <EmailLayout preview="Reset your Trainio password">
+      <EmailHeading>Reset your password</EmailHeading>
 
-          {/* Footer */}
-          <Section className="mobile:px-4 mobile:pt-12 mobile:pb-12 border-stroke border-t px-6 pt-20 pb-16">
-            <Text className="font-13 text-fg-2 m-0 max-w-[320px] font-sans">
-              helps teams cut through noise—clear priorities, fewer tabs, and
-              less busywork from idea to shipped work.
-            </Text>
-            <Row align="left">
-              <Column className="w-full align-top">
-                <Section align="left" className="mt-8 w-[152px]">
-                  <Row align="left">
-                    <Column className="w-[20px] pr-6">
-                      <Link
-                        href="https://example.com/"
-                        className="inline-block"
-                      >
-                        <Img
-                          src={`/static/shared/social-x-white.png`}
-                          alt="X"
-                          width="20"
-                          height="20"
-                          className="block"
-                        />
-                      </Link>
-                    </Column>
-                    <Column className="w-[20px] pr-6">
-                      <Link
-                        href="https://example.com/"
-                        className="inline-block"
-                      >
-                        <Img
-                          src={`/static/shared/social-li-white.png`}
-                          alt="LinkedIn"
-                          width="20"
-                          height="20"
-                          className="block"
-                        />
-                      </Link>
-                    </Column>
-                    <Column className="w-[20px] pr-6">
-                      <Link
-                        href="https://example.com/"
-                        className="inline-block"
-                      >
-                        <Img
-                          src={`/static/shared/social-yt-white.png`}
-                          alt="YouTube"
-                          width="20"
-                          height="20"
-                          className="block"
-                        />
-                      </Link>
-                    </Column>
-                    <Column className="w-[20px]">
-                      <Link
-                        href="https://example.com/"
-                        className="inline-block"
-                      >
-                        <Img
-                          src={`/static/shared/social-gh-white.png`}
-                          alt="GitHub"
-                          width="20"
-                          height="20"
-                          className="block"
-                        />
-                      </Link>
-                    </Column>
-                  </Row>
-                </Section>
-              </Column>
-            </Row>
-            <Row align="left">
-              <Column className="w-full pt-8 align-top">
-                <Text className="font-11 text-fg-2 m-0 font-sans">
-                  123 Market Street, Floor 1
-                  <br />
-                  Tech City, CA, 94102
-                </Text>
-              </Column>
-            </Row>
-            <Row align="left">
-              <Column className="w-full pt-5 align-top">
-                <Text className="font-11 text-fg-2 m-0 max-w-[160px] font-sans">
-                  <Link href="https://example.com/" className="text-fg-2">
-                    Unsubscribe
-                  </Link>{" "}
-                  from marketing emails.
-                </Text>
-              </Column>
-            </Row>
-          </Section>
-        </Container>
-      </Body>
-    </Html>
-  </Tailwind>
-);
+      <Text style={styles.text}>{userName ? `Hi ${userName},` : "Hi,"}</Text>
 
-export default PasswordResetEmail;
+      <Text style={styles.text}>
+        We received a request to reset the password for your Trainio account.
+      </Text>
+
+      <Text style={styles.text}>
+        If you made this request, click the button below to choose a new
+        password.
+      </Text>
+
+      <div style={styles.buttonContainer}>
+        <EmailButton href={resetUrl}>Reset password</EmailButton>
+      </div>
+
+      <Text style={styles.warning}>
+        {`If you didn't request a password reset, no changes have been made to
+        your account. You can safely ignore this email.`}
+      </Text>
+
+      <Text style={styles.smallText}>
+        {`If the button doesn't work, copy and paste this URL into your browser:`}
+      </Text>
+
+      <Link href={resetUrl} style={styles.link}>
+        {resetUrl}
+      </Link>
+    </EmailLayout>
+  );
+}
+
+const styles = {
+  text: {
+    color: "#374151",
+    fontSize: "15px",
+    lineHeight: "24px",
+    margin: "0 0 16px",
+  },
+
+  warning: {
+    backgroundColor: "#f9fafb",
+    borderRadius: "8px",
+    color: "#4b5563",
+    fontSize: "13px",
+    lineHeight: "20px",
+    padding: "12px 16px",
+    margin: "24px 0",
+  },
+
+  smallText: {
+    color: "#6b7280",
+    fontSize: "13px",
+    lineHeight: "20px",
+    margin: "20px 0 8px",
+  },
+
+  link: {
+    color: "#4b5563",
+    fontSize: "12px",
+    lineHeight: "18px",
+    wordBreak: "break-all" as const,
+  },
+
+  buttonContainer: {
+    margin: "28px 0",
+  },
+};
