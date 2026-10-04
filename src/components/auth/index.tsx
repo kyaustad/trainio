@@ -167,6 +167,8 @@ export function BugReportForm() {
 }
 
 export function SignUpForm() {
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
+
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -178,29 +180,35 @@ export function SignUpForm() {
   });
 
   async function onSubmit(data: z.infer<typeof signUpSchema>) {
-    const { data: signUpData, error } = await authClient.signUp.email(
-      {
-        email: data.email,
-        password: data.password,
-        name: `${data.fName} ${data.lName}`,
-        fName: data.fName,
-        lName: data.lName,
-        image: "",
-        callbackURL: "/dashboard", // A URL to redirect to after the user verifies their email (optional)
-      },
-      {
-        onRequest: (ctx) => {
-          //show loading
+    setIsSubmitting(true);
+    try {
+      const { data: signUpData, error } = await authClient.signUp.email(
+        {
+          email: data.email,
+          password: data.password,
+          name: `${data.fName} ${data.lName}`,
+          fName: data.fName,
+          lName: data.lName,
+          image: "",
+          callbackURL: "/dashboard", // A URL to redirect to after the user verifies their email (optional)
         },
-        onSuccess: (ctx) => {
-          //redirect to the dashboard or sign in page
+        {
+          onRequest: (ctx) => {
+            //show loading
+          },
+          onSuccess: (ctx) => {
+            //redirect to the dashboard or sign in page
+          },
+          onError: (ctx) => {
+            // display the error message
+            alert(ctx.error.message);
+          },
         },
-        onError: (ctx) => {
-          // display the error message
-          alert(ctx.error.message);
-        },
-      },
-    );
+      );
+    } catch {
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -217,6 +225,7 @@ export function SignUpForm() {
           <FieldGroup>
             <div className="grid grid-cols-2 gap-4">
               <Controller
+                disabled={isSubmitting}
                 name="fName"
                 control={form.control}
                 render={({ field, fieldState }) => (
@@ -239,6 +248,7 @@ export function SignUpForm() {
               />
 
               <Controller
+                disabled={isSubmitting}
                 name="lName"
                 control={form.control}
                 render={({ field, fieldState }) => (
@@ -262,6 +272,7 @@ export function SignUpForm() {
             </div>
 
             <Controller
+              disabled={isSubmitting}
               name="email"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -285,6 +296,7 @@ export function SignUpForm() {
             />
 
             <Controller
+              disabled={isSubmitting}
               name="password"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -316,14 +328,19 @@ export function SignUpForm() {
 
       <CardFooter>
         <Field orientation="horizontal">
-          <Button type="button" variant="outline" onClick={() => form.reset()}>
+          <Button
+            disabled={isSubmitting}
+            type="button"
+            variant="outline"
+            onClick={() => form.reset()}
+          >
             Reset
           </Button>
 
           <Button
             type="submit"
             form="signup-form"
-            disabled={form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting || isSubmitting}
           >
             {form.formState.isSubmitting ? "Creating account..." : "Sign Up"}
           </Button>
