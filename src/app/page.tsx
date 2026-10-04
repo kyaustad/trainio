@@ -1,18 +1,11 @@
-import { auth } from "@/auth";
-import { headers } from "next/headers";
+import { SignUpForm } from "@/components/auth";
+import ThemeToggle from "@/components/custom/theme-toggle";
 
-export default async function Home() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  const noSession = session?.session === undefined;
+export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      {process.versions.bun}
-      {`\n`}
-      <br></br>
-      {noSession ? "No Session" : "Session Indeed"}
+      <ThemeToggle className="absolute top-4 right-4" />
+      <SignUpForm />
     </div>
   );
 }

@@ -18,6 +18,7 @@ export const auth = betterAuth({
         creator,
       },
       adminRoles: ["admin", "manager"],
+      defaultRole: "admin",
     }),
   ],
   database: drizzleAdapter(db, {
@@ -62,7 +63,7 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: "string",
-        input: true,
+        input: false,
       },
       fName: {
         type: "string",
