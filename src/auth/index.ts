@@ -1,10 +1,11 @@
 import { betterAuth } from "better-auth/minimal";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
 import { db } from "@/db"; // your drizzle instance
 import { waitUntil } from "@vercel/functions";
 import { sendEmail } from "@/lib/email";
 import { admin as adminPlugin } from "better-auth/plugins/admin";
 import { ac, admin, user, manager, creator } from "./permissions";
+import * as schema from "@/db/schema";
 
 export const auth = betterAuth({
   plugins: [
@@ -21,6 +22,7 @@ export const auth = betterAuth({
   ],
   database: drizzleAdapter(db, {
     provider: "pg", // or "mysql", "sqlite"
+    schema: schema,
   }),
   advanced: {
     backgroundTasks: {
@@ -43,7 +45,6 @@ export const auth = betterAuth({
       id,
     }),
   },
-
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url, token }, request) => {
@@ -53,6 +54,24 @@ export const auth = betterAuth({
         userName: user.name,
         verificationUrl: url,
       });
+    },
+  },
+
+  // Additional Fields
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        input: true,
+      },
+      fName: {
+        type: "string",
+        input: true,
+      },
+      lName: {
+        type: "string",
+        input: true,
+      },
     },
   },
 });
